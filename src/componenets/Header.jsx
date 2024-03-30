@@ -12,8 +12,8 @@ export default function Header() {
 
     
 
-    <div className='bg-cyan-50 shadow-sm sticky top-0 z-50'>
-        <header className='flex justify-between px-20 items-center max-w-8xl
+    <div className='bg-white shadow-sm sticky top-0 z-50'>
+        <header className='flex justify-between px-20 items-center max-w-6xl
                 mx-auto'>
             <div>
                 <img src={process.env.PUBLIC_URL + '/logo.png'} alt="logo" className='h-20 cursor-pointer p-2'
