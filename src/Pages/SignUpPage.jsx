@@ -2,6 +2,15 @@ import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import GoogleOAuth from "../componenets/GoogleOAuth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { toast } from "react-toastify";
+import db from "../config/firebase.js";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,6 +25,32 @@ export default function SignUpPage() {
       ...prev,
       [event.target.id]: event.target.value,
     }));
+  }
+  const auth = getAuth();
+  const navigate = useNavigate();
+  function onSignUpClick(event) {
+    event.preventDefault();
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
+        // Signed up
+        const user = userCredential.user;
+        console.log(user);
+        updateProfile(auth.currentUser, {
+          displayName: nametext,
+        });
+        const signupFormCopy = { ...signupForm };
+        delete signupFormCopy.password;
+        signupFormCopy.timestamp = serverTimestamp();
+
+        await setDoc(doc(db, "users", user.uid), signupFormCopy);
+        toast.success("Signed up successfully!");
+        navigate("/");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        toast.error("Oh no! Registration failed! ");
+      });
   }
 
   return (
@@ -33,7 +68,7 @@ export default function SignUpPage() {
             />
           </div>
           <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-            <form>
+            <form onSubmit={onSignUpClick}>
               <input
                 type="text"
                 className="bg-white appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-cyan-500 mb-6 transition duration-300 ease-in-out"
