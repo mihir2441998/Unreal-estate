@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import GoogleOAuth from "../componenets/GoogleOAuth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { toast } from "react-toastify";
 
 export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
   const [signinForm, setSigninForm] = useState({
     email: "",
     password: "",
@@ -15,6 +18,23 @@ export default function SignInPage() {
       ...prev,
       [event.target.id]: event.target.value,
     }));
+  }
+
+  function onSignInClick(event) {
+    event.preventDefault();
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredentail) => {
+        const user = userCredentail.user;
+        if (user) {
+          toast.success("Succesfully signed in!");
+          navigate("/");
+        }
+      })
+      .catch((error) => {
+        console.log(`Error while sign in : ${error}`);
+        toast.error("Invalid or no credentials provided.");
+      });
   }
 
   return (
@@ -32,7 +52,7 @@ export default function SignInPage() {
             />
           </div>
           <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-            <form>
+            <form onSubmit={onSignInClick}>
               <input
                 type="email"
                 className="bg-white appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-cyan-500 mb-6 transition duration-300 ease-in-out"

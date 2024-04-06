@@ -2,11 +2,55 @@ import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import GoogleOAuth from "../componenets/GoogleOAuth";
+import db from "../config/firebase.js";
+import {
+  fetchSignInMethodsForEmail,
+  getAuth,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import { toast } from "react-toastify";
+import {
+  QuerySnapshot,
+  collection,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 
 export default function ForgotPassPage() {
   const [email, setEmail] = useState("");
   function onChangeForm(event) {
     setEmail(event.target.value);
+  }
+
+  async function onResetClick(event) {
+    event.preventDefault();
+    const auth = getAuth();
+
+    checkIfEmailExists().then(async (result) => {
+      console.log(result);
+      if (result === true) {
+        await sendPasswordResetEmail(auth, email)
+          .then(() => {
+            toast.success("Email sent successfully!");
+          })
+          .catch((error) => {
+            toast.error("Something went wrong!");
+            toast.info("Please re-check provided email");
+            console.log(`Error on reset password: ${error}`);
+          });
+      } else {
+        toast.error("Please re-check provided email");
+      }
+    });
+  }
+
+  async function checkIfEmailExists() {
+    const q = query(collection(db, "users"), where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+    console.log(querySnapshot);
+    return !querySnapshot.empty;
   }
 
   return (
@@ -24,7 +68,7 @@ export default function ForgotPassPage() {
             />
           </div>
           <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-            <form>
+            <form onSubmit={onResetClick}>
               <input
                 type="email"
                 className="bg-white appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-cyan-500 mb-6 transition duration-300 ease-in-out"

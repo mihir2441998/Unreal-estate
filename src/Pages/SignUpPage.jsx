@@ -32,7 +32,6 @@ export default function SignUpPage() {
     event.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
-        // Signed up
         const user = userCredential.user;
         console.log(user);
         updateProfile(auth.currentUser, {
@@ -44,7 +43,8 @@ export default function SignUpPage() {
 
         await setDoc(doc(db, "users", user.uid), signupFormCopy);
         toast.success("Signed up successfully!");
-        navigate("/");
+        toast.info("Please login again to proceed.");
+        navigate("/sign-in");
       })
       .catch((error) => {
         const errorCode = error.code;
