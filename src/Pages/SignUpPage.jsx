@@ -36,6 +36,7 @@ export default function SignUpPage() {
         console.log(user);
         updateProfile(auth.currentUser, {
           displayName: nametext,
+          since: new Date(),
         });
         const signupFormCopy = { ...signupForm };
         delete signupFormCopy.password;

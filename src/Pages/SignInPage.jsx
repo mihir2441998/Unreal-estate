@@ -4,9 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 import GoogleOAuth from "../componenets/GoogleOAuth";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
+import useAuthStatusHook from "../hooks/useAuthStatusHook";
 
 export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const { setLoggedIn } = useAuthStatusHook();
   const navigate = useNavigate();
   const [signinForm, setSigninForm] = useState({
     email: "",
@@ -28,6 +30,7 @@ export default function SignInPage() {
         const user = userCredentail.user;
         if (user) {
           toast.success("Succesfully signed in!");
+          setLoggedIn(true);
           navigate("/");
         }
       })
