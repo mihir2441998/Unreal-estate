@@ -20,7 +20,7 @@ export default function Header() {
   }
 
   return (
-    <div className="bg-white shadow-sm sticky top-0 z-50">
+    <div className="bg-white shadow-sm sticky top-0 z-40">
       <header
         className="flex justify-between px-20 items-center max-w-6xl
                 mx-auto"
@@ -59,6 +59,21 @@ export default function Header() {
             >
               Offers
             </li>
+
+            {loggedIn && (
+              <li
+                className={`
+                        cursor-pointer text-lg text-gray-500 border-b-[3px] border-transparent 
+                        ${
+                          isPathCorrect("/profile") &&
+                          "text-gray-800 border-b-cyan-950"
+                        }
+                    `}
+                onClick={() => navigate("/profile")}
+              >
+                Profile
+              </li>
+            )}
 
             {loggedIn ? (
               <li>
