@@ -5,9 +5,11 @@ import { FiEdit2 } from "react-icons/fi";
 import { MdDone } from "react-icons/md";
 import { toast } from "react-toastify";
 import db from "../config/firebase";
+import { useNavigate } from "react-router";
 
 export default function ProfilePage() {
   const auth = getAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     displayName: auth.currentUser.displayName,
     email: auth.currentUser.email,
@@ -74,7 +76,7 @@ export default function ProfilePage() {
                     </div>
                     <input
                       style={{ color: !isEditing ? "black" : "" }}
-                      className="peer w-full h-full bg-transparent font-sans outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent px-3 py-2.5 rounded-[7px] !pr-9 border-blue-gray-200 focus:border-gray-900 text-sm lg:text-lg"
+                      className="peer w-full h-full bg-transparent font-sans outline outline-0 focus:outline-0 disabled:bg-cyan-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-t-cyan-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent px-3 py-2.5 rounded-[7px] !pr-9 border-cyan-gray-200 focus:border-gray-900 text-sm lg:text-lg"
                       value={displayName}
                       disabled={!isEditing}
                       onChange={onNameChange}
@@ -130,8 +132,32 @@ export default function ProfilePage() {
                 <span className="tracking-wide">My Offers</span>
               </div>
               <div className="text-gray-700"></div>
-              <button className="block w-full text-blue-800 text-sm font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:shadow-outline focus:bg-gray-100 hover:shadow-xs p-3 my-4">
+              <button className="block w-full text-cyan-800 text-sm font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:shadow-outline focus:bg-gray-100 hover:shadow-xs p-3 my-4">
                 Show Full Information
+              </button>
+              <button
+                type="button"
+                class="text-white bg-cyan-700 hover:bg-cyan-800 focus:ring-4 focus:outline-none focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800 justify-center w-full"
+                onClick={() => {
+                  navigate("/create-offer");
+                }}
+              >
+                Create a Propety Offer
+                <svg
+                  class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 14 10"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M1 5h12m0 0L9 1m4 4L9 9"
+                  />
+                </svg>
               </button>
             </div>
           </div>
