@@ -80,7 +80,7 @@ export default function Header() {
                 <button
                   onClick={onLogOutClick}
                   type="button"
-                  class="text-white bg-cyan-700 hover:bg-cyan-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 text-center inline-flex items-center me-2 py-1.5"
+                  className="text-white bg-cyan-700 hover:bg-cyan-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 text-center inline-flex items-center me-2 py-1.5"
                 >
                   <TbLogout />
                   Log out

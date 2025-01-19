@@ -35,7 +35,7 @@ export default function ProfilePage() {
         toast.success("User profile updated!");
       }
     } catch (error) {
-      console.log("Erro on profile update: ", error);
+      console.log("Error on profile update: ", error);
       toast.error("Something went wrong!");
     }
   }
