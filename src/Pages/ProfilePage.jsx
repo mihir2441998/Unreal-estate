@@ -1,15 +1,19 @@
 import { getAuth, updateProfile } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
-import React, { useState } from "react";
+import { collection, doc, or, updateDoc, deleteDoc } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import { FiEdit2 } from "react-icons/fi";
 import { MdDone } from "react-icons/md";
 import { toast } from "react-toastify";
 import db from "../config/firebase";
 import { useNavigate } from "react-router";
+import { query, where, getDocs, orderBy } from "firebase/firestore";
+import ListingItem from "../componenets/ListingItem";
 
 export default function ProfilePage() {
   const auth = getAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [listings, setListings] = useState(null);
   const [formData, setFormData] = useState({
     displayName: auth.currentUser.displayName,
     email: auth.currentUser.email,
@@ -52,6 +56,45 @@ export default function ProfilePage() {
       ...prev,
       displayName: event.target.value,
     }));
+  }
+
+  useEffect(() => {
+    async function fetchUserListings() {
+      const listingsRef = collection(db, "listings");
+      const q = query(
+        listingsRef,
+        where("userRef", "==", auth.currentUser.uid),
+        orderBy("timestamp", "desc")
+      );
+      const querySnapshot = await getDocs(q);
+      let listings = [];
+      querySnapshot.forEach((doc) => {
+        return listings.push({
+          id: doc.id,
+          data: doc.data(),
+        });
+      });
+      setListings(listings);
+      console.log(listings);
+
+      setLoading(false);
+    }
+    fetchUserListings();
+  }, []);
+
+  async function onDelete(listingId) {
+    if (window.confirm("Are you sure you want to delete?")) {
+      await deleteDoc(doc(db, "listings", listingId));
+      let updatedListings = listings.filter(
+        (listing) => listing.id !== listingId
+      );
+      setListings(updatedListings);
+      toast.success("Listing deleted!");
+    }
+  }
+
+  function onEdit(listingId) {
+    navigate(`/edit-offer/${listingId}`);
   }
 
   return (
@@ -131,20 +174,18 @@ export default function ProfilePage() {
                 </span>
                 <span className="tracking-wide">My Offers</span>
               </div>
-              <div className="text-gray-700"></div>
-              <button className="block w-full text-cyan-800 text-sm font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:shadow-outline focus:bg-gray-100 hover:shadow-xs p-3 my-4">
-                Show Full Information
-              </button>
+              <div className="text-gray-700 pb-4"></div>
+
               <button
                 type="button"
-                class="text-white bg-cyan-700 hover:bg-cyan-800 focus:ring-4 focus:outline-none focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800 justify-center w-full"
+                className="text-white bg-cyan-700 hover:bg-cyan-800 focus:ring-4 focus:outline-none focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-800 justify-center w-full"
                 onClick={() => {
                   navigate("/create-offer");
                 }}
               >
                 Create a Propety Offer
                 <svg
-                  class="rtl:rotate-180 w-3.5 h-3.5 ms-2"
+                  className="rtl:rotate-180 w-3.5 h-3.5 ms-2"
                   aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -159,6 +200,31 @@ export default function ProfilePage() {
                   />
                 </svg>
               </button>
+              {!loading && listings.length === 0 && (
+                <>
+                  <h1 className="pt-4 text-center mb-4 text-3xl leading-none tracking-tight text-gray-900 md:text-lg lg:text-lg dark:text-cyan-700">
+                    No listings yet
+                  </h1>
+                </>
+              )}
+              {!loading && listings.length > 0 && (
+                <>
+                  <h1 className="pt-4 text-center mb-4 text-4xl font-bold  leading-none tracking-tight text-gray-900 md:text-xl lg:text-2xl dark:text-cyan-700">
+                    Your Listings
+                  </h1>
+                  <ul className="sm:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                    {listings.map((listing) => (
+                      <ListingItem
+                        key={listing.id}
+                        id={listing.id}
+                        listing={listing.data}
+                        onDelete={() => onDelete(listing.id)}
+                        onEdit={() => onEdit(listing.id)}
+                      />
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
           </div>
         </div>

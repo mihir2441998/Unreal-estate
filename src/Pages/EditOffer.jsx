@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Loading from "../componenets/Loading";
 import { toast } from "react-toastify";
 import db from "../config/firebase";
@@ -10,10 +10,10 @@ import {
 } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import { v4 as uuidv4 } from "uuid";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { useNavigate } from "react-router";
+import { addDoc, collection, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { useNavigate, useParams } from "react-router";
 
-export default function CreateOffer() {
+export default function EditOffer() {
   const navigate = useNavigate();
   const auth = getAuth();
   const [geoLocationEnabled, setGeoLocationEnabled] = useState(true);
@@ -50,6 +50,36 @@ export default function CreateOffer() {
     longitude,
     images,
   } = formData;
+
+  const params = useParams();
+
+  const [listing, setListing] = useState(null);
+
+  useEffect(() => {
+    if (listing && listing.userRef !== auth.currentUser.uid) {
+      toast.error("You can't edit this listing");
+      navigate("/");
+    }
+  }, [auth.currentUser.uid, listing, navigate]);
+
+  useEffect(() => {
+    setLoading(true);
+    async function fetchListing() {
+        const docRef = doc(db, "listings", params.listingId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setListing(docSnap.data());
+        setFormData({ ...docSnap.data() });
+        setLoading(false);
+      } else {
+        navigate("/");
+        toast.error("Listing does not exist");
+      }
+    }
+
+    fetchListing();
+
+  },[]);
 
   function checkApiCallsLimit() {
     const currentDay = new Date().toISOString().split("T")[0]; // Get today's date (YYYY-MM-DD)
@@ -202,10 +232,12 @@ export default function CreateOffer() {
     delete formDataCopy.latitude;
     delete formDataCopy.longitude;
 
-    const docRef = await addDoc(collection(db, "listings"), formDataCopy);
+    const docRef = doc(db, "listings", params.listingId);
+    await updateDoc(docRef, formDataCopy);
+
     setLoading(false);
-    toast.success("Listing created");
-    navigate(`/category/${rentOrSell}/${docRef.id}`);
+    toast.success("Listing Edited!");
+    navigate(`/profile`);
   }
 
   function getLatLonWithHighestConfidence(data) {
@@ -239,7 +271,7 @@ export default function CreateOffer() {
   return (
     <div>
       <div className="text-3xl text-cyan-900 font-bold text-center py-10">
-        Create an Offer
+        Edit Offer
       </div>
       <div>
         <form className="max-w-sm mx-auto" onSubmit={onSubmit}>
@@ -609,7 +641,7 @@ export default function CreateOffer() {
               type="submit"
               className="text-white bg-cyan-700 hover:bg-cyan-800 focus:ring-4 focus:outline-none focus:ring-cyan-300 font-medium rounded-lg text-sm  px-5 py-2.5 w-full text-center flex items-center justify-center"
             >
-              Create Offer
+              Edit Offer
               <svg
                 className="rtl:rotate-180 w-3.5 h-3.5 ms-2"
                 aria-hidden="true"
