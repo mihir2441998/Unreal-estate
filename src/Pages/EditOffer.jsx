@@ -239,7 +239,7 @@ export default function EditOffer() {
     toast.success("Listing Edited!");
     navigate(`/profile`);
   }
-
+ 
   function getLatLonWithHighestConfidence(data) {
     if (!data.features || data.features.length === 0) {
       return { lat: undefined, lon: undefined }; // Handle empty features array
