@@ -14,6 +14,7 @@ import PrivateRoute from "./Pages/PrivateRoute";
 import CreateOffer from "./Pages/CreateOffer";
 import EditOffer from "./Pages/EditOffer";
 import Listing from "./Pages/Listing";
+import "leaflet/dist/leaflet.css";
 
 function App() {
   return (
