@@ -15,6 +15,7 @@ import CreateOffer from "./Pages/CreateOffer";
 import EditOffer from "./Pages/EditOffer";
 import Listing from "./Pages/Listing";
 import "leaflet/dist/leaflet.css";
+import Category from "./Pages/Category";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route path="/sign-in" element={<SignInPage />} />
           <Route path="/forgot-password" element={<ForgotPassPage />} />
           <Route path="/offers" element={<OffersPage />} />
+          <Route path="/category/:categoryName" element={<Category />} />
           <Route path="/create-offer" element={<PrivateRoute />}>
             <Route path="/create-offer" element={<CreateOffer />} />
           </Route>
